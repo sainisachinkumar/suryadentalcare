@@ -2,8 +2,6 @@ const header = document.querySelector("[data-header]");
 const nav = document.querySelector("[data-nav]");
 const toggle = document.querySelector("[data-menu-toggle]");
 const year = document.querySelector("[data-year]");
-const appointmentForm = document.querySelector("[data-appointment-form]");
-const appointmentStatus = document.querySelector("[data-appointment-status]");
 const slides = [...document.querySelectorAll("[data-slide]")];
 const slideDots = [...document.querySelectorAll("[data-slide-dot]")];
 const mapFacade = document.querySelector("[data-map-facade]");
@@ -33,57 +31,6 @@ nav.addEventListener("click", (event) => {
 
 window.addEventListener("scroll", updateHeader, { passive: true });
 updateHeader();
-
-if (appointmentForm) {
-  appointmentForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const submitButton = appointmentForm.querySelector('button[type="submit"]');
-    const formData = new FormData(appointmentForm);
-    const payload = Object.fromEntries(formData.entries());
-
-    if (appointmentStatus) {
-      appointmentStatus.textContent = "Sending your appointment request...";
-      appointmentStatus.dataset.state = "loading";
-    }
-
-    if (submitButton) {
-      submitButton.disabled = true;
-    }
-
-    try {
-      const response = await fetch(appointmentForm.action || "/api/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Unable to send appointment request.");
-      }
-
-      appointmentForm.reset();
-
-      if (appointmentStatus) {
-        appointmentStatus.textContent = result.message || "Appointment sent to Telegram.";
-        appointmentStatus.dataset.state = "success";
-      }
-    } catch (error) {
-      if (appointmentStatus) {
-        appointmentStatus.textContent = error.message || "Something went wrong while sending the appointment.";
-        appointmentStatus.dataset.state = "error";
-      }
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-      }
-    }
-  });
-}
 
 if (mapFacade) {
   const loadMap = () => {
